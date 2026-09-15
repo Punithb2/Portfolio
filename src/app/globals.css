@@ -1,0 +1,243 @@
+@import "tailwindcss";
+
+/* Dark is the default palette; [data-theme="light"] swaps the same tokens. */
+@theme {
+  --color-ink: #09090b;
+  --color-ink-2: #111114;
+  --color-ink-3: #18181c;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-bone: #f2f0ea;
+  --color-mute: #8d8b86;
+  --color-acid: #c8ff4d; /* fills: buttons, glows, pills */
+  --color-accent: #c8ff4d; /* text, thin strokes, small dots */
+  --color-on-acid: #09090b; /* text sitting on an acid fill */
+
+  --font-sans: var(--font-geist), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-instrument), ui-serif, Georgia, serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, "Cascadia Code", monospace;
+
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+:root {
+  color-scheme: dark;
+  --glow-1: rgb(200 255 77 / 0.1);
+  --glow-2: rgb(124 196 255 / 0.08);
+  --glow-3: rgb(255 122 156 / 0.06);
+  --glow-cursor: rgb(200 255 77 / 0.05);
+  --numeral: rgb(255 255 255 / 0.07);
+  --grain-opacity: 0.05;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-ink: #f1eee6;
+  --color-ink-2: #faf8f3;
+  --color-ink-3: #e6e2d8;
+  --color-line: rgb(20 20 22 / 0.1);
+  --color-bone: #141416;
+  --color-mute: #69665e;
+  --color-acid: #c4fa45;
+  --color-accent: #4a7a00;
+
+  --glow-1: rgb(180 240 40 / 0.32);
+  --glow-2: rgb(110 185 255 / 0.26);
+  --glow-3: rgb(255 140 170 / 0.2);
+  --glow-cursor: rgb(150 210 20 / 0.12);
+  --numeral: rgb(20 20 22 / 0.08);
+  --grain-opacity: 0.07;
+}
+
+/* Keeps a subtree on the dark palette whatever the page theme (project artwork). */
+.theme-dark {
+  --color-ink: #09090b;
+  --color-ink-2: #111114;
+  --color-ink-3: #18181c;
+  --color-line: rgb(255 255 255 / 0.08);
+  --color-bone: #f2f0ea;
+  --color-mute: #8d8b86;
+  --color-accent: #c8ff4d;
+}
+
+html {
+  background: var(--color-ink);
+}
+
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+body {
+  background: var(--color-ink);
+  color: var(--color-bone);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background: var(--color-acid);
+  color: var(--color-on-acid);
+}
+
+/* Theme switch: a circular reveal driven from ThemeToggle */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+/* Project accent text: pure accent on dark, deepened on light for contrast */
+.accent-text {
+  color: var(--accent);
+}
+:root[data-theme="light"] .accent-text {
+  color: color-mix(in oklab, var(--accent) 50%, #000);
+}
+
+/* Film grain overlay */
+.grain {
+  pointer-events: none;
+  position: fixed;
+  inset: -50%;
+  z-index: 60;
+  opacity: var(--grain-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: grain 8s steps(10) infinite;
+}
+
+@keyframes grain {
+  0%, 100% { transform: translate(0, 0); }
+  10% { transform: translate(-5%, -10%); }
+  30% { transform: translate(3%, -15%); }
+  50% { transform: translate(12%, 9%); }
+  70% { transform: translate(9%, 4%); }
+  90% { transform: translate(-1%, 7%); }
+}
+
+/* ---------- Section backdrops ---------- */
+
+.blob {
+  border-radius: 9999px;
+  background: radial-gradient(circle at center, var(--glow) 0%, transparent 65%);
+}
+.blob-1 { --glow: var(--glow-1); animation: float-a 18s ease-in-out infinite; }
+.blob-2 { --glow: var(--glow-2); animation: float-b 24s ease-in-out infinite; }
+.blob-3 { --glow: var(--glow-3); animation: float-a 30s ease-in-out infinite reverse; }
+
+@keyframes float-a {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  33% { transform: translate(10%, 8%) scale(1.15); }
+  66% { transform: translate(-6%, 12%) scale(0.92); }
+}
+@keyframes float-b {
+  0%, 100% { transform: translate(0, 0) scale(1.05); }
+  50% { transform: translate(-12%, -8%) scale(0.9); }
+}
+
+.bg-grid {
+  background-image:
+    linear-gradient(var(--color-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--color-line) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: radial-gradient(ellipse 75% 65% at 50% 45%, #000 15%, transparent 75%);
+}
+
+.bg-dots {
+  background-image: radial-gradient(color-mix(in oklab, var(--color-bone) 20%, transparent) 1px, transparent 1.6px);
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse 80% 70% at 50% 50%, #000 25%, transparent 80%);
+}
+
+.bg-diagonal {
+  background-image: repeating-linear-gradient(-45deg, var(--color-line) 0 1px, transparent 1px 22px);
+  mask-image: linear-gradient(to bottom, transparent, #000 30%, #000 70%, transparent);
+}
+
+.beam {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  overflow: hidden;
+  background: linear-gradient(to bottom, transparent, var(--color-line) 12%, var(--color-line) 88%, transparent);
+}
+.beam::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  width: 1px;
+  height: 160px;
+  top: -160px;
+  background: linear-gradient(to bottom, transparent, var(--color-accent), transparent);
+  animation: beam 7s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+  animation-delay: inherit;
+}
+@keyframes beam {
+  to { top: 100%; }
+}
+
+.numeral {
+  font-size: clamp(11rem, 30vw, 28rem);
+  font-weight: 600;
+  line-height: 0.8;
+  letter-spacing: -0.07em;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--numeral);
+  user-select: none;
+}
+
+.ring-spin {
+  animation: spin 40s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* ---------- Misc ---------- */
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 40s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(1); opacity: 0.7; }
+  100% { transform: scale(2.6); opacity: 0; }
+}
+
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--color-mute);
+}
+
+/* Hide native cursor only when the custom cursor is active */
+html.has-cursor,
+html.has-cursor * {
+  cursor: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .grain,
+  .marquee-track,
+  .blob,
+  .beam::after,
+  .ring-spin {
+    animation: none;
+  }
+}
