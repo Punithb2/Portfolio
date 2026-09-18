@@ -70,6 +70,9 @@ export type Project = {
   live?: string;
   accent: string; // CSS color used for the project's artwork
   glyph: "atlas" | "points" | "mesh" | "doc" | "leaf" | "house" | "medal" | "pulse";
+  /** Optional screenshot or demo GIF, shown in the detail view in place of the artwork. */
+  media?: string;
+  mediaAlt?: string;
 };
 
 export const projects: Project[] = [
@@ -114,6 +117,8 @@ export const projects: Project[] = [
     live: "https://huggingface.co/spaces/Punith25/recon3d",
     accent: "#7cc4ff",
     glyph: "points",
+    media: "/recon3d-demo.gif",
+    mediaAlt: "The recon3d demo: a silhouette is uploaded and reconstructed into a rotating 3D point cloud.",
   },
   {
     slug: "omnimesh",

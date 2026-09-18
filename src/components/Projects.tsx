@@ -2,6 +2,7 @@
 
 import { AnimatePresence, LayoutGroup, motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { projects, type Project } from "@/data/portfolio";
 import { EASE_OUT, lockScroll } from "@/lib/motion";
 import { ArrowUpRight, Close, Github } from "./icons";
@@ -181,8 +182,19 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
         exit={{ y: 60, opacity: 0, scale: 0.97 }}
         transition={{ duration: 0.6, ease: EASE_OUT }}
       >
-        <div className="relative aspect-[16/8]">
-          <ProjectArt glyph={project.glyph} accent={project.accent} />
+        <div className="relative aspect-[16/8] overflow-hidden bg-ink-3">
+          {project.media ? (
+            // eslint-disable-next-line @next/next/no-img-element -- animated GIF, nothing for the optimizer to do
+            <img
+              src={project.media}
+              alt={project.mediaAlt ?? `${project.title} demo`}
+              loading="lazy"
+              decoding="async"
+              className="h-full w-full object-cover object-top"
+            />
+          ) : (
+            <ProjectArt glyph={project.glyph} accent={project.accent} />
+          )}
           <button
             ref={closeRef}
             onClick={onClose}
@@ -266,6 +278,11 @@ export default function Projects() {
   const open = projects.find((p) => p.slug === openSlug);
   const close = useCallback(() => setOpenSlug(null), []);
 
+  // The section sits in an isolated stacking context, so the dialog is portalled to
+  // <body> — otherwise the fixed header paints over it.
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
   return (
     <section id="work" className="relative mx-auto max-w-7xl px-5 py-28 md:px-10 md:py-36">
       <div className="flex flex-col justify-between gap-8 md:flex-row md:items-end">
@@ -324,7 +341,11 @@ export default function Projects() {
         </a>
       </div>
 
-      <AnimatePresence>{open && <ProjectModal key={open.slug} project={open} onClose={close} />}</AnimatePresence>
+      {mounted &&
+        createPortal(
+          <AnimatePresence>{open && <ProjectModal key={open.slug} project={open} onClose={close} />}</AnimatePresence>,
+          document.body,
+        )}
     </section>
   );
 }
