@@ -24,6 +24,9 @@ export default function ProjectArt({ glyph, accent }: { glyph: Project["glyph"];
       />
       <svg viewBox="0 0 400 300" className="absolute inset-0 h-full w-full transition-transform duration-700 ease-out-expo group-hover:scale-110" aria-hidden>
         {glyph === "atlas" && <Atlas c={accent} />}
+        {glyph === "points" && <Points c={accent} />}
+        {glyph === "mesh" && <Mesh c={accent} />}
+        {glyph === "house" && <House c={accent} />}
         {glyph === "doc" && <Doc c={accent} />}
         {glyph === "leaf" && <Leaf c={accent} />}
         {glyph === "medal" && <Medal c={accent} />}
@@ -55,6 +58,144 @@ function Atlas({ c }: { c: string }) {
       <text y={5} textAnchor="middle" fontSize={13} fontFamily="monospace" fill="#09090b" fontWeight={700}>
         92%
       </text>
+    </g>
+  );
+}
+
+/** A sketched line that lifts into a wireframe cube — sketch to 3D mesh. */
+function Mesh({ c }: { c: string }) {
+  const verts: [number, number][] = [
+    [200, 60],
+    [290, 110],
+    [110, 110],
+    [200, 160],
+    [200, 250],
+    [110, 200],
+    [290, 200],
+  ];
+  return (
+    <g>
+      <motion.path
+        d="M95 235 Q150 205 200 238 T305 232"
+        fill="none"
+        stroke="rgba(242,240,234,.5)"
+        strokeWidth={2}
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: [0, 1, 1] }}
+        transition={{ duration: 3, repeat: Infinity }}
+      />
+      <motion.g animate={{ y: [8, -8, 8] }} transition={wave(5)}>
+        <polygon points="200,60 290,110 200,160 110,110" fill={`${c}22`} stroke={c} strokeWidth={1.5} />
+        <polygon points="110,110 200,160 200,250 110,200" fill={`${c}10`} stroke={c} strokeWidth={1.5} />
+        <polygon points="290,110 200,160 200,250 290,200" fill={`${c}30`} stroke={c} strokeWidth={1.5} />
+        {[0.25, 0.5, 0.75].map((t) => (
+          <g key={t} stroke={c} strokeOpacity={0.35}>
+            <line x1={110 + 90 * t} y1={110 + 50 * t} x2={110 + 90 * t} y2={200 + 50 * t} />
+            <line x1={200 + 90 * t} y1={160 - 50 * t} x2={200 + 90 * t} y2={250 - 50 * t} />
+            <line x1={200 - 90 * t} y1={60 + 50 * t} x2={290 - 90 * t} y2={110 + 50 * t} />
+          </g>
+        ))}
+        {verts.map(([x, y], i) => (
+          <motion.circle key={i} cx={x} cy={y} r={3.5} fill={c} animate={{ opacity: [0.3, 1, 0.3] }} transition={wave(2, i * 0.2)} />
+        ))}
+      </motion.g>
+      <g fontFamily="monospace" fontSize={11} fill="rgba(242,240,234,.75)">
+        <text x={300} y={70}>silhouette</text>
+        <text x={300} y={86} fill={c}>
+          IoU 84–93%
+        </text>
+      </g>
+    </g>
+  );
+}
+
+/** A flat silhouette on the left turning into an orbiting point cloud on the right. */
+function Points({ c }: { c: string }) {
+  // deterministic pseudo-random cloud so server and client render the same thing
+  const cloud = Array.from({ length: 90 }, (_, i) => {
+    const a = i * 2.399963;
+    const r = 58 * Math.sqrt(((i * 37) % 90) / 90);
+    const depth = ((i * 53) % 100) / 100;
+    return { x: Math.cos(a) * r, y: Math.sin(a) * r * 0.75 - depth * 12, d: depth };
+  });
+
+  return (
+    <g>
+      <g transform="translate(95 150)">
+        <path
+          d="M-34 60 L-34 -18 Q-34 -46 0 -46 Q34 -46 34 -18 L34 60 Z"
+          fill="rgba(242,240,234,.16)"
+          stroke="rgba(242,240,234,.45)"
+          strokeWidth={1.5}
+        />
+        <text y={86} textAnchor="middle" fontFamily="monospace" fontSize={11} fill="rgba(242,240,234,.5)">
+          silhouette
+        </text>
+      </g>
+
+      <motion.g animate={{ x: [0, 6, 0], opacity: [0.35, 1, 0.35] }} transition={wave(2.6)}>
+        <path d="M140 150 H190" stroke={c} strokeWidth={1.5} strokeDasharray="4 5" />
+        <path d="M184 145 L192 150 L184 155" fill={c} />
+      </motion.g>
+
+      <motion.g animate={{ rotate: 360 }} transition={loop(18)} style={{ transformOrigin: "275px 150px" }}>
+        {cloud.map((p, i) => (
+          <circle key={i} cx={275 + p.x} cy={150 + p.y} r={0.8 + p.d * 1.8} fill={c} opacity={0.25 + p.d * 0.7} />
+        ))}
+      </motion.g>
+      <text x={275} y={236} textAnchor="middle" fontFamily="monospace" fontSize={11} fill={c}>
+        2,048 points
+      </text>
+    </g>
+  );
+}
+
+/** A house outline with a price trend climbing behind it. */
+function House({ c }: { c: string }) {
+  const bars = [40, 62, 55, 84, 96, 120];
+  return (
+    <g>
+      <g opacity={0.5}>
+        {bars.map((h, i) => (
+          <motion.rect
+            key={i}
+            x={60 + i * 26}
+            width={14}
+            rx={3}
+            fill={c}
+            opacity={0.35}
+            initial={{ y: 250, height: 0 }}
+            animate={{ y: [250, 250 - h, 250 - h, 250], height: [0, h, h, 0] }}
+            transition={{ duration: 5, delay: i * 0.12, repeat: Infinity, times: [0, 0.25, 0.75, 1], ease: "easeInOut" }}
+          />
+        ))}
+      </g>
+
+      <motion.g animate={{ y: [0, -6, 0] }} transition={wave(4.5)}>
+        <path d="M200 70 L290 140 V250 H110 V140 Z" fill={`${c}1f`} stroke={c} strokeWidth={1.8} strokeLinejoin="round" />
+        <path d="M95 148 L200 62 L305 148" fill="none" stroke={c} strokeWidth={2.4} strokeLinecap="round" strokeLinejoin="round" />
+        <rect x={180} y={190} width={40} height={60} rx={3} fill="rgba(242,240,234,.14)" stroke={c} />
+        <rect x={128} y={166} width={34} height={30} rx={3} fill="rgba(242,240,234,.1)" stroke={c} />
+        <rect x={238} y={166} width={34} height={30} rx={3} fill="rgba(242,240,234,.1)" stroke={c} />
+      </motion.g>
+
+      <motion.path
+        d="M70 230 L120 205 L170 212 L220 170 L270 150 L330 96"
+        fill="none"
+        stroke={c}
+        strokeWidth={2.5}
+        strokeLinecap="round"
+        initial={{ pathLength: 0 }}
+        animate={{ pathLength: [0, 1, 1, 0] }}
+        transition={{ duration: 5, repeat: Infinity, times: [0, 0.45, 0.85, 1], ease: "easeInOut" }}
+      />
+      <g fontFamily="monospace" fontSize={11} fill="rgba(242,240,234,.75)">
+        <text x={40} y={60}>w · x + b</text>
+        <text x={40} y={78} fill={c}>
+          numpy only
+        </text>
+      </g>
     </g>
   );
 }
