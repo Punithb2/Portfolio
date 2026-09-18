@@ -1,16 +1,30 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useState } from "react";
-import { EASE_IN_OUT, lockScroll } from "@/lib/motion";
+import { useEffect, useLayoutEffect, useState } from "react";
+import { EASE_IN_OUT, INTRO_KEY, introSeen, lockScroll, prefersReducedMotion } from "@/lib/motion";
 
 const WORDS = ["Models", "Agents", "Pipelines", "Interfaces", "Punith B"];
 
 export default function Preloader() {
   const [count, setCount] = useState(0);
   const [done, setDone] = useState(false);
+  const [skip, setSkip] = useState(false);
+
+  // Runs before paint, so a repeat visit in the same session never flashes the overlay.
+  useLayoutEffect(() => {
+    if (introSeen() || prefersReducedMotion()) {
+      window.__introDone = true;
+      setSkip(true);
+      setDone(true);
+    }
+  }, []);
 
   useEffect(() => {
+    if (skip) {
+      lockScroll(false);
+      return;
+    }
     history.scrollRestoration = "manual";
     window.scrollTo(0, 0);
     lockScroll(true);
@@ -27,6 +41,9 @@ export default function Preloader() {
       else
         timeout = setTimeout(() => {
           window.__introDone = true;
+          try {
+            sessionStorage.setItem(INTRO_KEY, "1");
+          } catch {}
           lockScroll(false);
           setDone(true);
         }, 200);
@@ -37,7 +54,8 @@ export default function Preloader() {
       cancelAnimationFrame(raf);
       clearTimeout(timeout);
     };
-  }, []);
+    // re-runs once `skip` flips, so the counter never keeps the page locked on a repeat visit
+  }, [skip]);
 
   const word = WORDS[Math.min(WORDS.length - 1, Math.floor((count / 100) * WORDS.length))];
 

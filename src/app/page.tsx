@@ -23,8 +23,11 @@ export default function Home() {
     <SmoothScroll>
       <Preloader />
       <Cursor />
+      <a href="#main" className="skip-link">
+        Skip to content
+      </a>
       <Navbar />
-      <main>
+      <main id="main">
         <Hero />
         <div className="overflow-hidden py-10">
           <Marquee />

@@ -82,7 +82,7 @@ export default function Contact() {
         >
           <a
             href={`mailto:${profile.email}`}
-            className="break-all text-[clamp(1.4rem,3.5vw,2.75rem)] font-medium tracking-tight underline decoration-line decoration-1 underline-offset-8 transition-colors hover:text-accent hover:decoration-accent"
+            className="break-words text-[clamp(1.4rem,3.5vw,2.75rem)] font-medium tracking-tight underline decoration-line decoration-1 underline-offset-8 transition-colors hover:text-accent hover:decoration-accent"
           >
             {profile.email}
           </a>

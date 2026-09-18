@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useMotionValueEvent, useScroll } from "framer-motion";
 import { useEffect, useState } from "react";
 import { profile } from "@/data/portfolio";
-import { EASE_IN_OUT, EASE_OUT, INTRO_DELAY, lockScroll, scrollToId } from "@/lib/motion";
+import { EASE_IN_OUT, EASE_OUT, INTRO_DELAY, introSeen, lockScroll, scrollToId } from "@/lib/motion";
 import ThemeToggle from "./ThemeToggle";
 
 const LINKS = [
@@ -21,12 +21,13 @@ export default function Navbar() {
   const [active, setActive] = useState("");
   const [open, setOpen] = useState(false);
   // The header waits for the preloader only on its first entrance, not on every hide/show.
+  const [introDelay] = useState(() => (introSeen() ? 0 : INTRO_DELAY + 0.3));
   const [entered, setEntered] = useState(false);
 
   useEffect(() => {
-    const t = setTimeout(() => setEntered(true), (INTRO_DELAY + 1) * 1000);
+    const t = setTimeout(() => setEntered(true), (introDelay + 1) * 1000);
     return () => clearTimeout(t);
-  }, []);
+  }, [introDelay]);
 
   useMotionValueEvent(scrollY, "change", (y) => {
     const prev = scrollY.getPrevious() ?? 0;
@@ -62,12 +63,13 @@ export default function Navbar() {
   return (
     <>
       <motion.header
-        className="fixed inset-x-0 top-0 z-50 px-4 pt-4 md:px-8 md:pt-6"
+        className="fixed inset-x-0 top-0 z-50 px-5 pt-4 md:px-10 md:pt-6"
         initial={{ y: -100, opacity: 0 }}
         animate={{ y: hidden ? -110 : 0, opacity: 1 }}
-        transition={{ duration: 0.7, ease: EASE_OUT, delay: entered ? 0 : INTRO_DELAY + 0.3 }}
+        transition={{ duration: 0.7, ease: EASE_OUT, delay: entered ? 0 : introDelay }}
       >
         <nav
+          aria-label="Main"
           className={`mx-auto flex max-w-7xl items-center justify-between rounded-full border px-3 py-2 transition-colors duration-500 md:px-4 ${
             scrolled ? "border-line bg-ink/70 backdrop-blur-xl" : "border-transparent"
           }`}
@@ -84,6 +86,7 @@ export default function Navbar() {
               <li key={l.id}>
                 <button
                   onClick={() => go(l.id)}
+                  aria-current={active === l.id ? "true" : undefined}
                   className={`relative rounded-full px-4 py-2 text-sm transition-colors ${
                     active === l.id ? "text-ink" : "text-bone/70 hover:text-bone"
                   }`}

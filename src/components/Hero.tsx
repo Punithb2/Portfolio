@@ -3,7 +3,7 @@
 import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { profile } from "@/data/portfolio";
-import { EASE_OUT, INTRO_DELAY, scrollToId } from "@/lib/motion";
+import { EASE_OUT, INTRO_DELAY, introSeen, scrollToId } from "@/lib/motion";
 import { ArrowDown, ArrowUpRight, Download } from "./icons";
 import ParticleField from "./ParticleField";
 import { Magnetic } from "./ui";
@@ -65,7 +65,8 @@ export default function Hero() {
   const fade = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
   const scale = useTransform(scrollYProgress, [0, 1], [1, 0.92]);
 
-  const d = INTRO_DELAY;
+  // no preloader on a repeat visit, so the hero should not sit and wait for one
+  const [d] = useState(() => (introSeen() ? 0 : INTRO_DELAY));
 
   return (
     <section ref={ref} id="top" className="relative flex min-h-[100svh] flex-col overflow-hidden px-5 pb-8 pt-28 md:px-10 md:pb-10">

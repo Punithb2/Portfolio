@@ -50,7 +50,7 @@ function Counter({ value, suffix, decimals = 0 }: { value: number; suffix: strin
 
 export default function About() {
   return (
-    <section id="about" className="relative mx-auto max-w-7xl px-5 py-28 md:px-10 md:py-40">
+    <section id="about" className="relative mx-auto max-w-7xl px-5 py-28 md:px-10 md:py-36">
       <div className="grid gap-12 md:grid-cols-12">
         <div className="md:col-span-3">
           <Reveal y={16}>

@@ -78,7 +78,8 @@ function ProjectCard({ project, index, onOpen }: { project: Project; index: numb
           my.set(0.5);
         }}
         style={{ rotateX, rotateY, transformStyle: "preserve-3d", ["--accent" as string]: project.accent }}
-        className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-ink-2 outline-none transition-colors duration-500 hover:border-bone/20 focus-visible:border-accent ${
+        aria-label={`${project.title} — view details`}
+        className={`group relative flex h-full flex-col overflow-hidden rounded-3xl border border-line bg-ink-2 transition-colors duration-500 hover:border-bone/20 ${
           featured ? "md:flex-row" : ""
         } ${featured && index % 2 === 1 ? "md:flex-row-reverse" : ""}`}
       >
@@ -126,15 +127,35 @@ function ProjectCard({ project, index, onOpen }: { project: Project; index: numb
 
 function ProjectModal({ project, onClose }: { project: Project; onClose: () => void }) {
   const closeRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    const opener = document.activeElement as HTMLElement | null;
     lockScroll(true);
     closeRef.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") return onClose();
+      if (e.key !== "Tab" || !panelRef.current) return;
+      // keep Tab inside the dialog
+      const items = panelRef.current.querySelectorAll<HTMLElement>('a[href], button:not([disabled])');
+      if (!items.length) return;
+      const first = items[0];
+      const last = items[items.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault();
+        last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault();
+        first.focus();
+      }
+    };
+
     window.addEventListener("keydown", onKey);
     return () => {
       lockScroll(false);
       window.removeEventListener("keydown", onKey);
+      opener?.focus?.();
     };
   }, [onClose]);
 
@@ -150,6 +171,7 @@ function ProjectModal({ project, onClose }: { project: Project; onClose: () => v
       aria-label={project.title}
     >
       <motion.div
+        ref={panelRef}
         onClick={(e) => e.stopPropagation()}
         data-lenis-prevent
         style={{ ["--accent" as string]: project.accent }}

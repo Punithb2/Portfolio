@@ -46,7 +46,7 @@ export default function ParticleField({ className }: { className?: string }) {
       canvas.width = w * dpr;
       canvas.height = h * dpr;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const count = Math.min(150, Math.floor((w * h) / 9500));
+      const count = Math.min(w < 640 ? 60 : 150, Math.floor((w * h) / 9500));
       particles = Array.from({ length: count }, () => {
         const x = Math.random() * w;
         const y = Math.random() * h;

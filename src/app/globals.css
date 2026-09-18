@@ -226,6 +226,72 @@ body {
   color: var(--color-mute);
 }
 
+/* Anchored sections stop clear of the fixed header */
+section[id],
+footer[id],
+main[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* Keyboard focus is always visible, even where the custom cursor is hidden */
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+.skip-link {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 110;
+  transform: translateY(-300%);
+  border-radius: 9999px;
+  background: var(--color-acid);
+  color: var(--color-on-acid);
+  padding: 0.65rem 1.25rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: transform 0.3s var(--ease-out-expo);
+}
+.skip-link:focus-visible {
+  transform: translateY(0);
+}
+
+/* Slim, theme-aware scrollbar */
+html {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--color-bone) 28%, transparent) transparent;
+}
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-bone) 22%, transparent);
+  border: 3px solid transparent;
+  background-clip: content-box;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--color-bone) 38%, transparent);
+  background-clip: content-box;
+}
+
+/* Lighter background work on phones, where the paint cost actually shows */
+@media (max-width: 767px) {
+  .grain {
+    animation: none;
+    opacity: calc(var(--grain-opacity) * 0.6);
+  }
+  .blob-3 {
+    display: none;
+  }
+}
+
 /* Hide native cursor only when the custom cursor is active */
 html.has-cursor,
 html.has-cursor * {

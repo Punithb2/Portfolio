@@ -12,15 +12,26 @@ const instrument = Instrument_Serif({
 const jetbrains = JetBrains_Mono({ subsets: ["latin"], variable: "--font-jetbrains" });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://punithb.me"),
   title: "Punith B | AI / ML & Backend Engineer",
   description:
     "Portfolio of Punith B, a Bengaluru-based engineer building AI-powered products, multi-agent systems and real-time backends.",
   keywords: ["Punith B", "AI Engineer", "Machine Learning", "Backend Developer", "FastAPI", "Django", "React", "Portfolio"],
-  authors: [{ name: "Punith B" }],
+  authors: [{ name: "Punith B", url: "https://github.com/Punithb2" }],
+  creator: "Punith B",
+  alternates: { canonical: "/" },
   openGraph: {
     title: "Punith B | AI / ML & Backend Engineer",
     description: "AI-powered products, multi-agent systems and real-time backends.",
+    url: "https://punithb.me",
+    siteName: "Punith B",
+    locale: "en_IN",
     type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Punith B | AI / ML & Backend Engineer",
+    description: "AI-powered products, multi-agent systems and real-time backends.",
   },
 };
 
